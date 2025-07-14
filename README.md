@@ -1,5 +1,7 @@
 # AHZ-Stack-PHP: PHP Development Environment with FrankenPHP, MySQL, Redis, and Admin Tools
 
+![Dashboard AHZ-Stack-PHP](Screenshot-AHZ-Stack-PHP.png)
+
 AHZ-Stack-PHP adalah lingkungan pengembangan PHP yang lengkap dan siap pakai dengan dashboard monitoring terintegrasi. Proyek ini menyediakan:
 
 - **Web Server**: Caddy dengan FrankenPHP untuk eksekusi PHP berkinerja tinggi.
@@ -75,6 +77,8 @@ Setelah container berjalan, Anda dapat mengakses layanan pada URL berikut:
 Kode aplikasi PHP Anda harus ditempatkan di direktori `www/`.
 
 ### Dashboard Monitoring
+
+![Dashboard AHZ-Stack-PHP](dashboard-screenshot.svg)
 
 Dashboard monitoring menyediakan tampilan real-time dari:
 
