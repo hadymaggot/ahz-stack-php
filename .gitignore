@@ -1,0 +1,16 @@
+# AHZ-Stack-PHP v1.0.0 - PHP Development Environment
+# Copyright (c) 2024 ahadizapto <ahadizapto@gmail.com>
+# https://github.com/ahadizapto
+# Distributed under the MIT License
+
+# Environment variables
+.env
+
+# Local data directories
+/mysql/data/
+/redis/data/
+/caddy/data/
+/caddy/config/
+
+# Vendor directory for dependencies
+/www/vendor/

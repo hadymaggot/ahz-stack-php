@@ -1,0 +1,40 @@
+# AHZ-Stack-PHP: PHP Development Environment with FrankenPHP, MySQL, Redis, and Admin Tools
+# Version: 1.0.0
+# Developer: ahadizapto (9hs@tuta.io)
+# License: MIT
+
+{
+    auto_https off
+    frankenphp
+    order php_server before file_server
+}
+
+http://localhost, https://localhost {
+    root * /app/public
+
+    # Security headers
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "no-referrer-when-downgrade"
+        -Server
+    }
+
+    # Pass all requests to FrankenPHP
+    php_server
+}
+
+http://pma.localhost, https://pma.localhost {
+    basic_auth {
+        user JDJhJDEwJEVCN1h4LjExM3JqV1Noa1UuY3JpZ3U1M3h4Q2tYOFJjeVo5U3B3Q3JzV1d2U0x2TzNWbVJh
+    }
+    reverse_proxy phpmyadmin:80
+}
+
+http://redis.localhost, https://redis.localhost {
+    basic_auth {
+        user JDJhJDEwJEVCN1h4LjExM3JqV1Noa1UuY3JpZ3U1M3h4Q2tYOFJjeVo5U3B3Q3JzV1d2U0x2TzNWbVJh
+    }
+    reverse_proxy redis-commander:8081
+}

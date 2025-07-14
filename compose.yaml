@@ -1,0 +1,120 @@
+# AHZ-Stack-PHP: PHP Development Environment with FrankenPHP, MySQL, Redis, and Admin Tools
+# Version: 1.0.0
+# Developer: ahadizapto (9hs@tuta.io)
+# License: MIT
+
+# version: '3.8'
+
+services:
+  frankenphp:
+    build:
+      context: .
+      dockerfile: Dockerfile.frankenphp
+    container_name: ${APP_NAME:-lemp}-frankenphp
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/app/src
+      - ./vendor:/app/vendor
+      - ./www:/app/public
+      - ./Caddyfile:/etc/frankenphp/Caddyfile:ro
+      - ./php/php.ini:/usr/local/etc/php/conf.d/custom-php.ini:ro
+      - ./php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini:ro
+      - ./php/redis.ini:/usr/local/etc/php/conf.d/redis.ini:ro
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+    environment:
+      - APP_DOMAIN=${APP_DOMAIN:-localhost}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_ENABLE=${REDIS_ENABLE}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - MYSQL_HOST=mydb
+      - MYSQL_USER=${MYSQL_USER:-lemp_user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-userpassword}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-lemp_db}
+      - TZ=${TZ:-Asia/Jakarta}
+    depends_on:
+      - mydb
+      - redis
+    networks:
+      - lemp-network
+    restart: unless-stopped
+
+  mydb:
+    image: mysql:8.4.2
+    container_name: ${APP_NAME:-lemp}-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_USER: ${MYSQL_USER:-lemp_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-userpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-lemp_db}
+      TZ: ${TZ:-Asia/Jakarta}
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    ports:
+      - "3309:3306"
+    restart: unless-stopped
+    networks:
+      - lemp-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--host=localhost", "--user=root", "--password=${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 30s
+      retries: 5
+      timeout: 20s
+
+  # WARNING: phpMyAdmin is a security risk in production. Remove or secure it before deployment.
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2.1
+    container_name: ${APP_NAME:-lemp}-phpmyadmin
+    ports:
+      - "8180:80"
+    environment:
+      PMA_HOST: mydb
+      PMA_PORT: 3309
+      PMA_USER: ${MYSQL_USER:-lemp_user}
+      PMA_PASSWORD: ${MYSQL_PASSWORD:-userpassword}
+      UPLOAD_LIMIT: ${UPLOAD_LIMIT:-256M}
+      POST_MAX_SIZE: ${POST_MAX_SIZE:-256M}
+      UPLOAD_MAX_FILESIZE: ${UPLOAD_MAX_FILESIZE:-256M}
+      MAX_EXECUTION_TIME: ${MAX_EXECUTION_TIME:-600}
+      MAX_INPUT_TIME: ${MAX_INPUT_TIME:-600}
+    depends_on:
+      mydb:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - lemp-network
+
+  redis:
+    image: redis:alpine
+    container_name: ${APP_NAME:-lemp}-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redispassword}
+    ports:
+      - "6378:6379"
+    volumes:
+      - ./redis/data:/data
+    networks:
+      - lemp-network
+    restart: unless-stopped
+
+  # WARNING: Redis Commander is a security risk in production. Remove or secure it before deployment.
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: ${APP_NAME:-lemp}-redis-commander
+    ports:
+      - "8181:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6378:0:${REDIS_PASSWORD:-redispassword}
+      - HTTP_USER=${REDIS_COMMANDER_USER:-admin}
+      - HTTP_PASSWORD=${REDIS_COMMANDER_PASSWORD:-admin}
+    depends_on:
+      - redis
+    networks:
+      - lemp-network
+    restart: unless-stopped
+
+networks:
+  lemp-network:
+    driver: bridge

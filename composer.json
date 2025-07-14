@@ -1,0 +1,19 @@
+{
+    "name": "ahz/php-ahz",
+    "description": "PHP Development Environment with FrankenPHP, MySQL, Redis, and Admin Tools",
+    "version": "1.0.0-beta",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ahadizapto",
+            "email": "9hs@tuta.io",
+            "homepage": "https://hadymaggot.github.io"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

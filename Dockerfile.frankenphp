@@ -1,0 +1,60 @@
+# AHZ-Stack-PHP: PHP Development Environment with FrankenPHP, MySQL, Redis, and Admin Tools
+# Version: 1.0.0
+# Developer: ahadizapto (9hs@tuta.io)
+# License: MIT
+
+FROM dunglas/frankenphp:1.8-php8.3-bookworm
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    libicu-dev \
+    libonig-dev \
+    default-mysql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configure and install PHP extensions
+RUN install-php-extensions \
+    pdo \
+    pdo_mysql \
+    mysqli \
+    gd \
+    zip \
+    intl \
+    mbstring \
+    opcache \
+    redis \
+    apcu
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copy PHP configuration
+COPY php/php.ini $PHP_INI_DIR/conf.d/custom-php.ini
+COPY php/opcache.ini $PHP_INI_DIR/conf.d/opcache.ini
+COPY php/redis.ini $PHP_INI_DIR/conf.d/redis.ini
+
+# Copy Caddy configuration
+COPY Caddyfile /etc/caddy/Caddyfile
+
+# Set working directory
+WORKDIR /app/public
+
+# Copy application code
+COPY www /app/public
+
+# Set environment variables for Caddy to work behind a proxy
+ENV SERVER_NAME="{$APP_DOMAIN}"
+
+# Enable FrankenPHP worker mode for better performance
+ENV FRANKENPHP_CONFIG="worker ./index.php"
+
+# Expose ports
+EXPOSE 80
+EXPOSE 443
+EXPOSE 443/udp
