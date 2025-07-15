@@ -17,6 +17,7 @@ services:
       - ./src:/app/src
       - ./vendor:/app/vendor
       - ./www:/app/public
+      - ./frameworks:/app/frameworks
       - ./Caddyfile:/etc/frankenphp/Caddyfile:ro
       - ./php/php.ini:/usr/local/etc/php/conf.d/custom-php.ini:ro
       - ./php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini:ro
@@ -34,6 +35,7 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD:-userpassword}
       - MYSQL_DATABASE=${MYSQL_DATABASE:-lemp_db}
       - TZ=${TZ:-Asia/Jakarta}
+      - PHP_FRAMEWORK=${PHP_FRAMEWORK:-none}
     depends_on:
       - mydb
       - redis
@@ -44,6 +46,7 @@ services:
   mydb:
     image: mysql:8.4.2
     container_name: ${APP_NAME:-lemp}-mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
       MYSQL_USER: ${MYSQL_USER:-lemp_user}

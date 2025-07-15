@@ -39,10 +39,8 @@ class MySQLMonitor
                 return ['status' => 'error', 'message' => 'Could not connect to MySQL: ' . $mysqli->connect_error];
             }
 
-            // Get server information
             $server_info = $mysqli->server_info;
 
-            // Get global variables
             $variables = [];
             $result = $mysqli->query("SHOW GLOBAL VARIABLES");
             if ($result) {
@@ -52,7 +50,6 @@ class MySQLMonitor
                 $result->free();
             }
 
-            // Get global status
             $status = [];
             $result = $mysqli->query("SHOW GLOBAL STATUS");
             if ($result) {
@@ -62,7 +59,6 @@ class MySQLMonitor
                 $result->free();
             }
 
-            // Count databases and tables
             $databases = [];
             $total_tables = 0;
             $result = $mysqli->query("SHOW DATABASES");
@@ -83,15 +79,12 @@ class MySQLMonitor
                 $result->free();
             }
 
-            // Calculate connections and memory usage
             $max_connections = isset($variables['max_connections']) ? (int)$variables['max_connections'] : 0;
             $current_connections = isset($status['Threads_connected']) ? (int)$status['Threads_connected'] : 0;
             $connection_usage = $max_connections > 0 ? round(($current_connections / $max_connections) * 100, 2) : 0;
 
-            // Calculate uptime
             $uptime = isset($status['Uptime']) ? (int)$status['Uptime'] : 0;
 
-            // Calculate queries per second
             $queries = isset($status['Questions']) ? (int)$status['Questions'] : 0;
             $queries_per_second = $uptime > 0 ? round($queries / $uptime, 2) : 0;
 

@@ -7,7 +7,3 @@
  * @link       https://hadymaggot.github.io
  * @license    MIT License
  */
-
-// This file is required by FrankenPHP worker mode
-// It can be used to preload classes for better performance
-// For now, we'll leave it empty

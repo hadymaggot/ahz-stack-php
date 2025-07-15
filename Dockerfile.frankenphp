@@ -48,6 +48,44 @@ WORKDIR /app/public
 # Copy application code
 COPY www /app/public
 
+# Create frameworks directory
+RUN mkdir -p /app/frameworks
+
+# Install framework based on environment variable
+ARG PHP_FRAMEWORK=none
+ENV PHP_FRAMEWORK=${PHP_FRAMEWORK}
+
+# Install selected framework
+RUN if [ "$PHP_FRAMEWORK" = "laravel" ]; then \
+        composer create-project --prefer-dist laravel/laravel /app/frameworks/laravel && \
+        cd /app/frameworks/laravel && \
+        cp .env.example .env && \
+        sed -i "s/DB_HOST=127.0.0.1/DB_HOST=mydb/g" .env && \
+        sed -i "s/DB_DATABASE=laravel/DB_DATABASE=${MYSQL_DATABASE:-lemp_db}/g" .env && \
+        sed -i "s/DB_USERNAME=root/DB_USERNAME=${MYSQL_USER:-lemp_user}/g" .env && \
+        sed -i "s/DB_PASSWORD=/DB_PASSWORD=${MYSQL_PASSWORD:-userpassword}/g" .env && \
+        sed -i "s/REDIS_HOST=127.0.0.1/REDIS_HOST=redis/g" .env && \
+        sed -i "s/REDIS_PASSWORD=null/REDIS_PASSWORD=${REDIS_PASSWORD:-redispassword}/g" .env && \
+        php artisan key:generate && \
+        chown -R www-data:www-data /app/frameworks/laravel/storage /app/frameworks/laravel/bootstrap/cache; \
+    elif [ "$PHP_FRAMEWORK" = "symfony" ]; then \
+        composer create-project symfony/skeleton /app/frameworks/symfony && \
+        cd /app/frameworks/symfony && composer require webapp && \
+        echo "DATABASE_URL=mysql://${MYSQL_USER:-lemp_user}:${MYSQL_PASSWORD:-userpassword}@mydb:3306/${MYSQL_DATABASE:-lemp_db}?serverVersion=8.0" > .env.local && \
+        echo "REDIS_URL=redis://redis:6379?password=${REDIS_PASSWORD:-redispassword}" >> .env.local && \
+        chown -R www-data:www-data /app/frameworks/symfony/var; \
+    elif [ "$PHP_FRAMEWORK" = "codeigniter" ]; then \
+        composer create-project codeigniter4/appstarter /app/frameworks/codeigniter && \
+        cd /app/frameworks/codeigniter && \
+        cp env .env && \
+        sed -i 's/# CI_ENVIRONMENT = production/CI_ENVIRONMENT = development/g' .env && \
+        sed -i 's/database.default.hostname = localhost/database.default.hostname = mydb/g' .env && \
+        sed -i "s/database.default.database = ci4/database.default.database = ${MYSQL_DATABASE:-lemp_db}/g" .env && \
+        sed -i "s/database.default.username = root/database.default.username = ${MYSQL_USER:-lemp_user}/g" .env && \
+        sed -i "s/database.default.password = /database.default.password = ${MYSQL_PASSWORD:-userpassword}/g" .env && \
+        chown -R www-data:www-data /app/frameworks/codeigniter/writable; \
+    fi
+
 # Set environment variables for Caddy to work behind a proxy
 ENV SERVER_NAME="{$APP_DOMAIN}"
 

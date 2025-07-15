@@ -21,20 +21,48 @@ http://localhost, https://localhost {
         -Server
     }
 
-    # Pass all requests to FrankenPHP
-    php_server
+    # Rewrite rules for frameworks
+    @laravel expression {env.PHP_FRAMEWORK} == "laravel"
+    handle @laravel {
+        root * /app/frameworks/laravel/public
+        php_server
+    }
+
+    @symfony expression {env.PHP_FRAMEWORK} == "symfony"
+    handle @symfony {
+        root * /app/frameworks/symfony/public
+        php_server
+    }
+
+    @codeigniter expression {env.PHP_FRAMEWORK} == "codeigniter"
+    handle @codeigniter {
+        root * /app/frameworks/codeigniter/public
+        php_server
+    }
+
+    # Default handler for no framework
+    @default expression {env.PHP_FRAMEWORK} == "none" || {env.PHP_FRAMEWORK} == ""
+    handle @default {
+        # Pass all requests to FrankenPHP
+        php_server
+    }
+
+    # Fallback handler
+    handle {
+        php_server
+    }
 }
 
 http://pma.localhost, https://pma.localhost {
     basic_auth {
-        user JDJhJDEwJEVCN1h4LjExM3JqV1Noa1UuY3JpZ3U1M3h4Q2tYOFJjeVo5U3B3Q3JzV1d2U0x2TzNWbVJh
+        admin $2y$10$BQHBvdY0bM0jW5NZgzFCOuox1ZPE9z9Fn1zU7IT9J.GhK1ZZz7ITq
     }
     reverse_proxy phpmyadmin:80
 }
 
 http://redis.localhost, https://redis.localhost {
     basic_auth {
-        user JDJhJDEwJEVCN1h4LjExM3JqV1Noa1UuY3JpZ3U1M3h4Q2tYOFJjeVo5U3B3Q3JzV1d2U0x2TzNWbVJh
+        admin $2y$10$BQHBvdY0bM0jW5NZgzFCOuox1ZPE9z9Fn1zU7IT9J.GhK1ZZz7ITq
     }
     reverse_proxy redis-commander:8081
 }

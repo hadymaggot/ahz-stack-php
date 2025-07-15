@@ -6,9 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'App\\Cache\\Opcache' => $baseDir . '/src/Cache/Opcache.php',
-    'App\\Cache\\RedisMonitor' => $baseDir . '/src/Cache/RedisMonitor.php',
-    'App\\Database\\MySQLMonitor' => $baseDir . '/src/Database/MySQLMonitor.php',
-    'App\\System\\SystemInfo' => $baseDir . '/src/System/SystemInfo.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
 );

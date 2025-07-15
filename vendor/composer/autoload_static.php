@@ -21,10 +21,6 @@ class ComposerStaticInitbb6d02209a77ddd265466354c86598ee
     );
 
     public static $classMap = array (
-        'App\\Cache\\Opcache' => __DIR__ . '/../..' . '/src/Cache/Opcache.php',
-        'App\\Cache\\RedisMonitor' => __DIR__ . '/../..' . '/src/Cache/RedisMonitor.php',
-        'App\\Database\\MySQLMonitor' => __DIR__ . '/../..' . '/src/Database/MySQLMonitor.php',
-        'App\\System\\SystemInfo' => __DIR__ . '/../..' . '/src/System/SystemInfo.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 

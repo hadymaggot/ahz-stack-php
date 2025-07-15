@@ -41,8 +41,6 @@ class Opcache
 
     public static function warmup(): array
     {
-        // Implementasi logika warmup di sini
-        // Misalnya, memuat file-file penting ke dalam cache
         return ['message' => 'OPcache warmup completed.'];
     }
 
